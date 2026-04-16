@@ -217,6 +217,142 @@
   .hero {
     padding: calc(var(--space-unit) * 20) 0 calc(var(--space-unit) * 16);
     position: relative;
+    overflow: hidden;
+  }
+
+  .hero > .container {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Hero orbit diagram -- sits on the right */
+  .hero-orbit {
+    position: absolute;
+    right: -6%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 52%;
+    max-width: 760px;
+    aspect-ratio: 1;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.85;
+  }
+
+  .hero-orbit-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .orbit-ring {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 0.75;
+  }
+
+  .orbit-ring.r1 { opacity: 0.18; }
+  .orbit-ring.r2 { opacity: 0.14; }
+  .orbit-ring.r3 { opacity: 0.10; }
+  .orbit-ring.r4 { opacity: 0.07; }
+
+  .orbit-crosshair {
+    stroke: var(--border);
+    stroke-width: 0.5;
+    opacity: 0.18;
+  }
+
+  .orbit-tick {
+    stroke: var(--accent);
+    stroke-width: 1;
+    opacity: 0.5;
+  }
+
+  .orbit-core {
+    fill: var(--accent);
+    filter: drop-shadow(0 0 10px var(--accent));
+    opacity: 0.85;
+  }
+
+  .orbit-core-ring {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1;
+    opacity: 0.35;
+  }
+
+  .orbit-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    fill: var(--text-muted);
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .orbit-label-accent {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    fill: var(--accent);
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+
+  .orbit-rotator {
+    transform-origin: 400px 400px;
+    transform-box: view-box;
+    animation: orbit-rotate 40s linear infinite;
+  }
+
+  .orbit-rotator-reverse {
+    transform-origin: 400px 400px;
+    transform-box: view-box;
+    animation: orbit-rotate-reverse 64s linear infinite;
+  }
+
+  @keyframes orbit-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes orbit-rotate-reverse {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-360deg); }
+  }
+
+  .orbit-traveler {
+    fill: var(--accent);
+    filter: drop-shadow(0 0 8px var(--accent));
+  }
+
+  .orbit-traveler-halo {
+    fill: var(--accent);
+    opacity: 0.2;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .orbit-rotator,
+    .orbit-rotator-reverse {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 960px) {
+    .hero-orbit {
+      width: 70%;
+      right: -18%;
+      opacity: 0.5;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero-orbit {
+      width: 90%;
+      right: -30%;
+      top: 65%;
+      opacity: 0.35;
+    }
   }
 
   .hero-rail {
@@ -1045,6 +1181,55 @@
 
   <!-- HERO -->
   <section class="hero">
+    <div class="hero-orbit" aria-hidden="true">
+      <svg class="hero-orbit-svg" viewBox="0 0 800 800" preserveAspectRatio="xMidYMid meet">
+
+        <!-- Concentric rings for depth -->
+        <circle class="orbit-ring r4" cx="400" cy="400" r="380"/>
+        <circle class="orbit-ring r3" cx="400" cy="400" r="310"/>
+        <circle class="orbit-ring r2" cx="400" cy="400" r="240"/>
+        <circle class="orbit-ring r1" cx="400" cy="400" r="170"/>
+
+        <!-- Crosshairs -->
+        <line class="orbit-crosshair" x1="0" y1="400" x2="800" y2="400"/>
+        <line class="orbit-crosshair" x1="400" y1="0" x2="400" y2="800"/>
+
+        <!-- Tick marks at cardinal points -->
+        <line class="orbit-tick" x1="400" y1="15" x2="400" y2="35"/>
+        <line class="orbit-tick" x1="400" y1="765" x2="400" y2="785"/>
+        <line class="orbit-tick" x1="15" y1="400" x2="35" y2="400"/>
+        <line class="orbit-tick" x1="765" y1="400" x2="785" y2="400"/>
+
+        <!-- Cardinal labels -->
+        <text class="orbit-label" x="400" y="58" text-anchor="middle">N</text>
+        <text class="orbit-label" x="400" y="755" text-anchor="middle">S</text>
+        <text class="orbit-label" x="55" y="404" text-anchor="middle">W</text>
+        <text class="orbit-label" x="745" y="404" text-anchor="middle">E</text>
+
+        <!-- Coordinate labels -->
+        <text class="orbit-label" x="150" y="180">△ 41.3°N</text>
+        <text class="orbit-label" x="560" y="180" text-anchor="end">▽ 73.2°W</text>
+        <text class="orbit-label-accent" x="150" y="640">SIGNAL / STANDING</text>
+        <text class="orbit-label" x="560" y="640" text-anchor="end">ETA / PENDING</text>
+
+        <!-- Outer orbital ring with traveler (slow clockwise rotation) -->
+        <g class="orbit-rotator">
+          <circle cx="400" cy="20" r="12" class="orbit-traveler-halo"/>
+          <circle cx="400" cy="20" r="5" class="orbit-traveler"/>
+        </g>
+
+        <!-- Secondary inner dot on counter-rotating ring -->
+        <g class="orbit-rotator-reverse">
+          <circle cx="400" cy="160" r="2.5" class="orbit-traveler" opacity="0.6"/>
+        </g>
+
+        <!-- Core -->
+        <circle class="orbit-core-ring" cx="400" cy="400" r="32"/>
+        <circle class="orbit-core-ring" cx="400" cy="400" r="22" opacity="0.25"/>
+        <circle class="orbit-core" cx="400" cy="400" r="6"/>
+
+      </svg>
+    </div>
     <div class="container">
       <div class="hero-rail">
         <span class="hero-rail-line" aria-hidden="true"></span>
