@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atreides is coming.</title>
+<meta name="description" content="A command center for the multi-agent age. From Ambitious Realism.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ========================================================
+     ATREIDES DESIGN TOKENS -- CALADAN NIGHT
+     Reference: Leto Prime, Atreides Design Token Spec v1.0
+     ======================================================== */
+
+  :root {
+    /* Background layers (oklch -> hex) */
+    --bg-primary: #0c1525;
+    --bg-card: #111c2e;
+    --bg-section: #182234;
+    --bg-accent-hover: #1a2538;
+    --bg-input: #273547;
+
+    /* Foreground */
+    --text-primary: #e8edf2;
+    --text-secondary: #d4dae1;
+    --text-muted: #b0bcc8;
+    --text-whisper: rgba(232, 237, 242, 0.35);
+
+    /* Accent: storm blue */
+    --accent: #6db3d4;
+    --accent-text: #091320;
+    --accent-dim: rgba(109, 179, 212, 0.5);
+    --accent-whisper: rgba(109, 179, 212, 0.12);
+
+    /* Borders */
+    --border: #4a7188;
+    --border-subtle: rgba(74, 113, 136, 0.25);
+
+    /* State colors */
+    --warning: #c4a040;
+    --warning-soft: rgba(196, 160, 64, 0.15);
+    --danger: #c44a3a;
+    --success: #4a9e78;
+
+    /* Typography */
+    --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+    /* Spacing (Prime surface: spacious) */
+    --space-unit: 8px;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+
+    /* Motion */
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --fast: 100ms;
+    --normal: 200ms;
+    --slow: 400ms;
+    --glacial: 800ms;
+  }
+
+  /* ========================================================
+     RESET & BASE
+     ======================================================== */
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.5;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Fractal noise overlay -- atmosphere, not decoration */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='256' height='256' filter='url(%23n)' opacity='0.85'/></svg>");
+    mix-blend-mode: overlay;
+  }
+
+  /* Deep ambient glow -- storm breaking through cloud */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 70% 10%, rgba(109, 179, 212, 0.08), transparent 60%),
+      radial-gradient(ellipse 60% 80% at 15% 90%, rgba(109, 179, 212, 0.05), transparent 60%);
+    animation: atreides-breathe 8s var(--ease) infinite;
+  }
+
+  @keyframes atreides-breathe {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body::before {
+      animation: none;
+      opacity: 0.8;
+    }
+    * {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  main, header, section, footer, nav {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ========================================================
+     LAYOUT
+     ======================================================== */
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 calc(var(--space-unit) * 4);
+  }
+
+  .container-narrow {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 calc(var(--space-unit) * 4);
+  }
+
+  /* ========================================================
+     NAVIGATION
+     ======================================================== */
+
+  nav {
+    padding: calc(var(--space-unit) * 4) 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  nav .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .wordmark {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 0.875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space-unit) * 1.5);
+  }
+
+  .wordmark-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+    animation: atreides-breathe 4s var(--ease) infinite;
+  }
+
+  .nav-meta {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+
+  /* ========================================================
+     HERO
+     ======================================================== */
+
+  .hero {
+    padding: calc(var(--space-unit) * 20) 0 calc(var(--space-unit) * 16);
+    position: relative;
+  }
+
+  .hero-rail {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: calc(var(--space-unit) * 6);
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space-unit) * 2);
+    opacity: 0;
+    animation: fade-up var(--glacial) var(--ease) forwards;
+    animation-delay: 200ms;
+  }
+
+  .hero-rail-line {
+    width: 48px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .hero-title {
+    font-family: var(--font-serif);
+    font-weight: 300;
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin-bottom: calc(var(--space-unit) * 4);
+    opacity: 0;
+    animation: fade-up var(--glacial) var(--ease) forwards;
+    animation-delay: 400ms;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+    font-variation-settings: 'opsz' 144;
+  }
+
+  .hero-subtitle {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: clamp(1.125rem, 1.8vw, 1.375rem);
+    line-height: 1.5;
+    color: var(--text-secondary);
+    max-width: 42ch;
+    margin-bottom: calc(var(--space-unit) * 8);
+    opacity: 0;
+    animation: fade-up var(--glacial) var(--ease) forwards;
+    animation-delay: 600ms;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: calc(var(--space-unit) * 6);
+    flex-wrap: wrap;
+    padding-top: calc(var(--space-unit) * 6);
+    border-top: 1px solid var(--border-subtle);
+    opacity: 0;
+    animation: fade-up var(--glacial) var(--ease) forwards;
+    animation-delay: 800ms;
+  }
+
+  .hero-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--space-unit) * 1);
+  }
+
+  .hero-meta-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .hero-meta-value {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ========================================================
+     THE QUESTION
+     ======================================================== */
+
+  .question {
+    padding: calc(var(--space-unit) * 20) 0;
+    background: var(--bg-card);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .question::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  .question::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  .question-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: calc(var(--space-unit) * 12);
+    align-items: center;
+  }
+
+  .question-prompt {
+    font-family: var(--font-serif);
+    font-weight: 300;
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--text-secondary);
+  }
+
+  .question-prompt span {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.7em;
+    margin-bottom: calc(var(--space-unit) * 2);
+    letter-spacing: 0;
+  }
+
+  .spokes {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--space-unit) * 1);
+  }
+
+  .spoke {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+    line-height: 1.2;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: baseline;
+    gap: calc(var(--space-unit) * 3);
+    padding: calc(var(--space-unit) * 2) 0;
+    border-bottom: 1px solid var(--border-subtle);
+    transition: color var(--normal) var(--ease), padding-left var(--normal) var(--ease);
+  }
+
+  .spoke:hover {
+    color: var(--text-primary);
+    padding-left: calc(var(--space-unit) * 2);
+  }
+
+  .spoke-num {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    letter-spacing: 0.1em;
+  }
+
+  .spoke-name em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--accent);
+  }
+
+  .answer {
+    margin-top: calc(var(--space-unit) * 16);
+    text-align: center;
+  }
+
+  .answer-prompt {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: calc(var(--space-unit) * 4);
+  }
+
+  .answer-word {
+    font-family: var(--font-serif);
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(6rem, 18vw, 16rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    color: var(--accent);
+    font-variation-settings: 'opsz' 144;
+    display: inline-block;
+    position: relative;
+  }
+
+  .answer-period {
+    color: var(--text-primary);
+    font-style: normal;
+    display: inline;
+  }
+
+  .answer-caption {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    margin-top: calc(var(--space-unit) * 4);
+    max-width: 32ch;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.5;
+  }
+
+  /* ========================================================
+     THE HUB (three-spoke)
+     ======================================================== */
+
+  .hub {
+    padding: calc(var(--space-unit) * 20) 0;
+    position: relative;
+  }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: calc(var(--space-unit) * 4);
+    display: flex;
+    align-items: center;
+    gap: calc(var(--space-unit) * 2);
+  }
+
+  .section-label::before {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .section-title {
+    font-family: var(--font-serif);
+    font-weight: 300;
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: calc(var(--space-unit) * 6);
+    max-width: 20ch;
+  }
+
+  .section-title em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  .section-lede {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    max-width: 48ch;
+    margin-bottom: calc(var(--space-unit) * 12);
+  }
+
+  .hub-diagram {
+    margin-top: calc(var(--space-unit) * 8);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: calc(var(--space-unit) * 4);
+  }
+
+  .spoke-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: calc(var(--space-unit) * 4);
+    position: relative;
+    transition: border-color var(--normal) var(--ease), transform var(--normal) var(--ease);
+    overflow: hidden;
+  }
+
+  .spoke-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--accent-dim);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--slow) var(--ease);
+  }
+
+  .spoke-card:hover {
+    border-color: var(--border);
+    transform: translateY(-2px);
+  }
+
+  .spoke-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .spoke-card-num {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    margin-bottom: calc(var(--space-unit) * 3);
+  }
+
+  .spoke-card-name {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1.125rem;
+    color: var(--text-primary);
+    margin-bottom: calc(var(--space-unit) * 1);
+  }
+
+  .spoke-card-role {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* ========================================================
+     THE DNA
+     ======================================================== */
+
+  .dna {
+    padding: calc(var(--space-unit) * 20) 0;
+    background: var(--bg-section);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .dna::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -20%;
+    transform: translateY(-50%);
+    width: 60%;
+    aspect-ratio: 1;
+    background: radial-gradient(circle at center, var(--accent-whisper), transparent 60%);
+    pointer-events: none;
+  }
+
+  .dna-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: calc(var(--space-unit) * 12);
+    align-items: start;
+    position: relative;
+    z-index: 2;
+  }
+
+  .dna-lineage {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--space-unit) * 5);
+  }
+
+  .lineage-item {
+    padding-left: calc(var(--space-unit) * 3);
+    border-left: 2px solid var(--border-subtle);
+    transition: border-color var(--normal) var(--ease);
+  }
+
+  .lineage-item:hover {
+    border-color: var(--accent);
+  }
+
+  .lineage-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: calc(var(--space-unit) * 1);
+  }
+
+  .lineage-name {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-style: italic;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: calc(var(--space-unit) * 1);
+  }
+
+  .lineage-desc {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .dna-prose {
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+  }
+
+  .dna-prose p {
+    margin-bottom: calc(var(--space-unit) * 3);
+  }
+
+  .dna-prose p:last-child {
+    margin-bottom: 0;
+  }
+
+  .dna-prose strong {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  .dna-prose em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  /* ========================================================
+     SIGNAL (the wait / coming soon)
+     ======================================================== */
+
+  .signal {
+    padding: calc(var(--space-unit) * 24) 0 calc(var(--space-unit) * 20);
+    text-align: center;
+    border-top: 1px solid var(--border-subtle);
+    position: relative;
+  }
+
+  .signal-kicker {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: calc(var(--space-unit) * 5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--space-unit) * 2);
+  }
+
+  .signal-kicker::before,
+  .signal-kicker::after {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: var(--accent-dim);
+  }
+
+  .signal-title {
+    font-family: var(--font-serif);
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: calc(var(--space-unit) * 5);
+  }
+
+  .signal-title .is {
+    color: var(--text-muted);
+  }
+
+  .signal-title .coming {
+    color: var(--text-primary);
+    position: relative;
+  }
+
+  .signal-title .ellipsis {
+    color: var(--accent);
+    font-style: normal;
+    letter-spacing: 0;
+    display: inline-block;
+    animation: dots 2.4s steps(4, end) infinite;
+  }
+
+  @keyframes dots {
+    0% { opacity: 0.2; }
+    25% { opacity: 0.5; }
+    50% { opacity: 0.8; }
+    75%, 100% { opacity: 1; }
+  }
+
+  .signal-prose {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    max-width: 48ch;
+    margin: 0 auto calc(var(--space-unit) * 8);
+  }
+
+  .signal-form {
+    display: flex;
+    gap: calc(var(--space-unit) * 1);
+    max-width: 480px;
+    margin: 0 auto;
+    padding: calc(var(--space-unit) * 1);
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    transition: border-color var(--normal) var(--ease);
+  }
+
+  .signal-form:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-whisper);
+  }
+
+  .signal-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: calc(var(--space-unit) * 2) calc(var(--space-unit) * 3);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    color: var(--text-primary);
+    outline: none;
+  }
+
+  .signal-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .signal-btn {
+    background: var(--accent);
+    color: var(--accent-text);
+    border: none;
+    padding: calc(var(--space-unit) * 2) calc(var(--space-unit) * 4);
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border-radius: calc(var(--radius-md) - 4px);
+    cursor: pointer;
+    transition: background var(--normal) var(--ease), transform var(--fast) var(--ease);
+    white-space: nowrap;
+  }
+
+  .signal-btn:hover {
+    background: #8cc4dd;
+  }
+
+  .signal-btn:active {
+    transform: scale(0.98);
+  }
+
+  .signal-meta {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-top: calc(var(--space-unit) * 5);
+  }
+
+  /* ========================================================
+     FOOTER
+     ======================================================== */
+
+  footer {
+    padding: calc(var(--space-unit) * 6) 0;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  footer .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: calc(var(--space-unit) * 3);
+  }
+
+  .footer-brand {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+  }
+
+  .footer-brand span {
+    color: var(--text-secondary);
+  }
+
+  .footer-tagline {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+  }
+
+  /* ========================================================
+     RESPONSIVE
+     ======================================================== */
+
+  @media (max-width: 960px) {
+    .question-grid,
+    .dna-grid {
+      grid-template-columns: 1fr;
+      gap: calc(var(--space-unit) * 8);
+    }
+
+    .hub-diagram {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hub-diagram {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-meta {
+      gap: calc(var(--space-unit) * 4);
+    }
+
+    .signal-form {
+      flex-direction: column;
+    }
+
+    .signal-btn {
+      padding: calc(var(--space-unit) * 2) calc(var(--space-unit) * 3);
+    }
+  }
+
+  /* Selection styling */
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-text);
+  }
+
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <div class="wordmark">
+      <span class="wordmark-dot" aria-hidden="true"></span>
+      <span>Ambitious&nbsp;Realism</span>
+    </div>
+    <div class="nav-meta">v0 / teaser</div>
+  </div>
+</nav>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-rail">
+        <span class="hero-rail-line" aria-hidden="true"></span>
+        <span>Atreides Prime</span>
+      </div>
+      <h1 class="hero-title">
+        Atreides<br>
+        <em>is coming.</em>
+      </h1>
+      <p class="hero-subtitle">
+        A command center for the multi-agent age. Built by the team that has been running the flock in production, month after month, on real shipping work.
+      </p>
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Platform</span>
+          <span class="hero-meta-value">macOS, native</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Positioning</span>
+          <span class="hero-meta-value">Premium tier</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">From</span>
+          <span class="hero-meta-value">Ambitious Realism</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Status</span>
+          <span class="hero-meta-value">In development</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE QUESTION -->
+  <section class="question">
+    <div class="container">
+
+      <div class="question-grid">
+        <div>
+          <h2 class="question-prompt">
+            <span>They ask:</span>
+            What is better?
+          </h2>
+        </div>
+        <div class="spokes" aria-label="The spokes">
+          <div class="spoke">
+            <span class="spoke-num">01</span>
+            <span class="spoke-name">Claude Code</span>
+          </div>
+          <div class="spoke">
+            <span class="spoke-num">02</span>
+            <span class="spoke-name">OpenCode</span>
+          </div>
+          <div class="spoke">
+            <span class="spoke-num">03</span>
+            <span class="spoke-name">Codex</span>
+          </div>
+          <div class="spoke">
+            <span class="spoke-num">04</span>
+            <span class="spoke-name">Pi</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="answer">
+        <div class="answer-prompt">Our answer</div>
+        <div class="answer-word">Yes<span class="answer-period">.</span></div>
+        <p class="answer-caption">
+          All of them, orchestrated. Conducted by a human who keeps judgment in the loop.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- THE HUB -->
+  <section class="hub">
+    <div class="container">
+      <div class="section-label">
+        <span>The Architecture</span>
+      </div>
+      <h2 class="section-title">
+        Prime is the <em>hub</em>. Your tools are the spokes.
+      </h2>
+      <p class="section-lede">
+        Not another agent. Not another runtime. The orchestration layer that sits above Claude Code, OpenCode, Codex, and Pi, so a single operator can run a coordinated flock instead of wrestling four separate tools.
+      </p>
+      <div class="hub-diagram">
+        <article class="spoke-card">
+          <div class="spoke-card-num">01 / Spoke</div>
+          <div class="spoke-card-name">Claude Code</div>
+          <div class="spoke-card-role">Anthropic native, depth on reasoning and long context.</div>
+        </article>
+        <article class="spoke-card">
+          <div class="spoke-card-num">02 / Spoke</div>
+          <div class="spoke-card-name">OpenCode</div>
+          <div class="spoke-card-role">Model-agnostic runtime, multi-provider coverage, extensible plugin layer.</div>
+        </article>
+        <article class="spoke-card">
+          <div class="spoke-card-num">03 / Spoke</div>
+          <div class="spoke-card-name">Codex</div>
+          <div class="spoke-card-role">OpenAI native, strong tool use, fast iteration cycles.</div>
+        </article>
+        <article class="spoke-card">
+          <div class="spoke-card-num">04 / Spoke</div>
+          <div class="spoke-card-name">Pi</div>
+          <div class="spoke-card-role">Minimalist harness, lean prompts, built for persistent specialized agents.</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE DNA -->
+  <section class="dna">
+    <div class="container">
+      <div class="section-label">
+        <span>The DNA</span>
+      </div>
+      <h2 class="section-title">
+        Three traditions, one <em>instrument</em>.
+      </h2>
+
+      <div class="dna-grid">
+
+        <div class="dna-lineage">
+          <div class="lineage-item">
+            <div class="lineage-label">Runtime</div>
+            <div class="lineage-name">IDD</div>
+            <div class="lineage-desc">Built the best coding agent runtime anyone has shipped. Pi is the foundation.</div>
+          </div>
+          <div class="lineage-item">
+            <div class="lineage-label">Interface</div>
+            <div class="lineage-name">Theo</div>
+            <div class="lineage-desc">Built the open UI foundation for agent tooling. T3 Code is the visual entry point.</div>
+          </div>
+          <div class="lineage-item">
+            <div class="lineage-label">Operations</div>
+            <div class="lineage-name">Ambitious Realism</div>
+            <div class="lineage-desc">Months of running a multi-agent flock in production. We know what breaks, what's elegant, and what the workflow actually needs.</div>
+          </div>
+        </div>
+
+        <div class="dna-prose">
+          <p>
+            IDD built the runtime. Theo built the UI. Neither has lived inside a flock, month after month, coordinating specialist agents across research, design, engineering, and review, every day, on real shipping work.
+          </p>
+          <p>
+            <strong>That is what Prime carries that nothing else does.</strong> The scar tissue of a method that assembled itself through use. The operational knowledge of putting agents to work, not just writing the runtime that lets them run.
+          </p>
+          <p>
+            Prime is what happens when the people who have been living inside the problem build the tool they wish they had on day one. It is <em>calm authority</em>, not reactive scramble.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SIGNAL -->
+  <section class="signal">
+    <div class="container-narrow">
+      <div class="signal-kicker">
+        <span>Get to Yes</span>
+      </div>
+      <h2 class="signal-title">
+        <span class="is">Atreides</span><br>
+        <span class="coming">is coming<span class="ellipsis">...</span></span>
+      </h2>
+      <p class="signal-prose">
+        Forge is the bridge. Prime is the destination. Leave your address and we will tell you the day the first boat lands.
+      </p>
+
+      <form class="signal-form" onsubmit="event.preventDefault(); this.querySelector('.signal-btn').textContent='Signal received'; this.querySelector('.signal-input').value='';">
+        <input type="email" class="signal-input" placeholder="you@somewhere.com" aria-label="Email" required>
+        <button type="submit" class="signal-btn">Stand watch</button>
+      </form>
+
+      <div class="signal-meta">No marketing. One message when we ship.</div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-brand">
+      <span>Ambitious Realism</span> &middot; Atreides Prime &middot; MMXXVI
+    </div>
+    <div class="footer-tagline">Calm authority.</div>
+  </div>
+</footer>
+
+<script>
+  // Subtle parallax on the ambient glow
+  document.addEventListener('mousemove', (e) => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const x = (e.clientX / window.innerWidth - 0.5) * 2;
+    const y = (e.clientY / window.innerHeight - 0.5) * 2;
+    document.body.style.setProperty('--parallax-x', `${x * 8}px`);
+    document.body.style.setProperty('--parallax-y', `${y * 8}px`);
+    document.body.style.backgroundPosition = `${x * 8}px ${y * 8}px`;
+  });
+
+  // The page is calm by design. No scroll reveal needed; content is present.
+</script>
+
+</body>
+</html>

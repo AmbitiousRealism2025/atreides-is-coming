@@ -1,0 +1,24 @@
+# Internal process documentation -- not part of the public demo
+SD2SU-REVIEW.md
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+
+# Playwright output
+.playwright-mcp/
+test-results/
+
+# Screenshots from verification runs
+prime-hero*.png
+prime-question*.png
+prime-answer*.png
+prime-hub*.png
+prime-dna*.png
+prime-signal*.png
+prime-landing*.png
+prime-mobile*.png
+page-*.png
