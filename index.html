@@ -181,12 +181,25 @@
     gap: calc(var(--space-unit) * 1.5);
   }
 
-  .wordmark-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 12px var(--accent);
+  .emblem {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+
+  .emblem .emblem-line {
+    stroke: var(--border);
+    stroke-width: 1;
+    opacity: 0.6;
+  }
+
+  .emblem .emblem-satellite {
+    fill: var(--text-muted);
+  }
+
+  .emblem .emblem-hub {
+    fill: var(--accent);
+    filter: drop-shadow(0 0 6px var(--accent-dim));
     animation: atreides-breathe 4s var(--ease) infinite;
   }
 
@@ -401,6 +414,66 @@
   .answer {
     margin-top: calc(var(--space-unit) * 16);
     text-align: center;
+    position: relative;
+  }
+
+  .answer-word-wrap {
+    position: relative;
+    display: inline-block;
+  }
+
+  .answer-rings {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .answer-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200px;
+    height: 200px;
+    margin-top: -100px;
+    margin-left: -100px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    opacity: 0;
+    animation: answer-sonar 7s var(--ease) infinite;
+  }
+
+  .answer-ring:nth-child(2) { animation-delay: 2.3s; }
+  .answer-ring:nth-child(3) { animation-delay: 4.6s; }
+
+  @keyframes answer-sonar {
+    0% {
+      transform: scale(0.4);
+      opacity: 0;
+    }
+    15% {
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(3);
+      opacity: 0;
+    }
+  }
+
+  .answer-word {
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .answer-ring {
+      animation: none;
+      display: none;
+    }
   }
 
   .answer-prompt {
@@ -495,66 +568,135 @@
     margin-bottom: calc(var(--space-unit) * 12);
   }
 
-  .hub-diagram {
-    margin-top: calc(var(--space-unit) * 8);
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: calc(var(--space-unit) * 4);
-  }
+  /* Hub-and-spoke diagram */
 
-  .spoke-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    padding: calc(var(--space-unit) * 4);
+  .orchestration {
+    margin-top: calc(var(--space-unit) * 10);
     position: relative;
-    transition: border-color var(--normal) var(--ease), transform var(--normal) var(--ease);
-    overflow: hidden;
+    width: 100%;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    aspect-ratio: 3 / 2;
   }
 
-  .spoke-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: var(--accent-dim);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform var(--slow) var(--ease);
+  .orchestration-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
 
-  .spoke-card:hover {
-    border-color: var(--border);
-    transform: translateY(-2px);
+  .orc-line {
+    stroke: var(--border);
+    stroke-width: 1;
+    opacity: 0.35;
   }
 
-  .spoke-card:hover::before {
-    transform: scaleX(1);
+  .orc-ring {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1;
+    opacity: 0.1;
+    transform-origin: center;
   }
 
-  .spoke-card-num {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.15em;
-    color: var(--text-muted);
-    margin-bottom: calc(var(--space-unit) * 3);
+  .orc-ring-breathe {
+    animation: ring-breathe 6s var(--ease) infinite;
+    transform-box: fill-box;
   }
 
-  .spoke-card-name {
+  .orc-ring-breathe.r2 { animation-delay: 2s; }
+  .orc-ring-breathe.r3 { animation-delay: 4s; }
+
+  @keyframes ring-breathe {
+    0% {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+    20% {
+      opacity: 0.4;
+    }
+    100% {
+      transform: scale(1.4);
+      opacity: 0;
+    }
+  }
+
+  .orc-spoke-node {
+    fill: var(--bg-card);
+    stroke: var(--border);
+    stroke-width: 1.5;
+    transition: stroke var(--normal) var(--ease), fill var(--normal) var(--ease);
+  }
+
+  .orc-spoke-group:hover .orc-spoke-node {
+    stroke: var(--accent);
+    fill: var(--bg-accent-hover);
+  }
+
+  .orc-hub-node {
+    fill: var(--accent);
+    filter: drop-shadow(0 0 18px var(--accent));
+  }
+
+  .orc-hub-ring {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1;
+    opacity: 0.3;
+  }
+
+  .orc-pulse {
+    fill: var(--accent);
+    filter: drop-shadow(0 0 6px var(--accent));
+  }
+
+  .orc-label-name {
     font-family: var(--font-sans);
+    font-size: 13px;
     font-weight: 600;
-    font-size: 1.125rem;
-    color: var(--text-primary);
-    margin-bottom: calc(var(--space-unit) * 1);
+    fill: var(--text-primary);
+    letter-spacing: 0.01em;
   }
 
-  .spoke-card-role {
+  .orc-label-role {
     font-family: var(--font-sans);
-    font-size: 0.875rem;
-    color: var(--text-muted);
-    line-height: 1.5;
+    font-size: 11px;
+    fill: var(--text-muted);
+  }
+
+  .orc-label-num {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    fill: var(--text-muted);
+    letter-spacing: 0.15em;
+  }
+
+  .orc-hub-label {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-style: italic;
+    fill: var(--accent-text);
+    font-weight: 500;
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+
+  .orc-hub-kicker {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    fill: var(--accent);
+    text-transform: uppercase;
+    text-anchor: middle;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .orc-ring-breathe,
+    .orc-pulse {
+      animation: none !important;
+      display: none;
+    }
   }
 
   /* ========================================================
@@ -841,14 +983,19 @@
       gap: calc(var(--space-unit) * 8);
     }
 
-    .hub-diagram {
-      grid-template-columns: repeat(2, 1fr);
+    .orchestration {
+      aspect-ratio: 4 / 3;
     }
   }
 
   @media (max-width: 640px) {
-    .hub-diagram {
-      grid-template-columns: 1fr;
+    .orchestration {
+      aspect-ratio: 3 / 4;
+    }
+
+    .answer-rings {
+      width: 320px;
+      height: 320px;
     }
 
     .hero-meta {
@@ -877,7 +1024,17 @@
 <nav>
   <div class="container">
     <div class="wordmark">
-      <span class="wordmark-dot" aria-hidden="true"></span>
+      <svg class="emblem" viewBox="0 0 32 32" aria-hidden="true">
+        <line class="emblem-line" x1="16" y1="8" x2="16" y2="16"/>
+        <line class="emblem-line" x1="24" y1="16" x2="16" y2="16"/>
+        <line class="emblem-line" x1="16" y1="24" x2="16" y2="16"/>
+        <line class="emblem-line" x1="8" y1="16" x2="16" y2="16"/>
+        <circle class="emblem-satellite" cx="16" cy="8" r="1.5"/>
+        <circle class="emblem-satellite" cx="24" cy="16" r="1.5"/>
+        <circle class="emblem-satellite" cx="16" cy="24" r="1.5"/>
+        <circle class="emblem-satellite" cx="8" cy="16" r="1.5"/>
+        <circle class="emblem-hub" cx="16" cy="16" r="3"/>
+      </svg>
       <span>Ambitious&nbsp;Realism</span>
     </div>
     <div class="nav-meta">v0 / teaser</div>
@@ -954,7 +1111,14 @@
 
       <div class="answer">
         <div class="answer-prompt">Our answer</div>
-        <div class="answer-word">Yes<span class="answer-period">.</span></div>
+        <div class="answer-word-wrap">
+          <div class="answer-rings" aria-hidden="true">
+            <span class="answer-ring"></span>
+            <span class="answer-ring"></span>
+            <span class="answer-ring"></span>
+          </div>
+          <div class="answer-word">Yes<span class="answer-period">.</span></div>
+        </div>
         <p class="answer-caption">
           All of them, orchestrated. Conducted by a human who keeps judgment in the loop.
         </p>
@@ -975,27 +1139,87 @@
       <p class="section-lede">
         Not another agent. Not another runtime. The orchestration layer that sits above Claude Code, OpenCode, Codex, and Pi, so a single operator can run a coordinated flock instead of wrestling four separate tools.
       </p>
-      <div class="hub-diagram">
-        <article class="spoke-card">
-          <div class="spoke-card-num">01 / Spoke</div>
-          <div class="spoke-card-name">Claude Code</div>
-          <div class="spoke-card-role">Anthropic native, depth on reasoning and long context.</div>
-        </article>
-        <article class="spoke-card">
-          <div class="spoke-card-num">02 / Spoke</div>
-          <div class="spoke-card-name">OpenCode</div>
-          <div class="spoke-card-role">Model-agnostic runtime, multi-provider coverage, extensible plugin layer.</div>
-        </article>
-        <article class="spoke-card">
-          <div class="spoke-card-num">03 / Spoke</div>
-          <div class="spoke-card-name">Codex</div>
-          <div class="spoke-card-role">OpenAI native, strong tool use, fast iteration cycles.</div>
-        </article>
-        <article class="spoke-card">
-          <div class="spoke-card-num">04 / Spoke</div>
-          <div class="spoke-card-name">Pi</div>
-          <div class="spoke-card-role">Minimalist harness, lean prompts, built for persistent specialized agents.</div>
-        </article>
+      <div class="orchestration" aria-label="Hub and spoke architecture diagram">
+        <svg class="orchestration-svg" viewBox="0 0 900 600" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Prime at the center, with four spokes: Claude Code, OpenCode, Codex, and Pi">
+
+          <!-- Connecting lines from spokes to hub -->
+          <line class="orc-line" x1="150" y1="140" x2="450" y2="300"/>
+          <line class="orc-line" x1="750" y1="140" x2="450" y2="300"/>
+          <line class="orc-line" x1="150" y1="460" x2="450" y2="300"/>
+          <line class="orc-line" x1="750" y1="460" x2="450" y2="300"/>
+
+          <!-- Ambient sonar rings around hub -->
+          <circle class="orc-ring orc-ring-breathe r1" cx="450" cy="300" r="80"/>
+          <circle class="orc-ring orc-ring-breathe r2" cx="450" cy="300" r="80"/>
+          <circle class="orc-ring orc-ring-breathe r3" cx="450" cy="300" r="80"/>
+
+          <!-- Static rings for depth -->
+          <circle class="orc-hub-ring" cx="450" cy="300" r="60" opacity="0.15"/>
+          <circle class="orc-hub-ring" cx="450" cy="300" r="45" opacity="0.25"/>
+
+          <!-- Animated pulses traveling from each spoke toward the hub -->
+          <circle class="orc-pulse" r="3.5">
+            <animate attributeName="cx" values="150;450" dur="2.8s" repeatCount="indefinite" begin="0s"/>
+            <animate attributeName="cy" values="140;300" dur="2.8s" repeatCount="indefinite" begin="0s"/>
+            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="2.8s" repeatCount="indefinite" begin="0s"/>
+          </circle>
+
+          <circle class="orc-pulse" r="3.5">
+            <animate attributeName="cx" values="750;450" dur="2.8s" repeatCount="indefinite" begin="0.7s"/>
+            <animate attributeName="cy" values="140;300" dur="2.8s" repeatCount="indefinite" begin="0.7s"/>
+            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="2.8s" repeatCount="indefinite" begin="0.7s"/>
+          </circle>
+
+          <circle class="orc-pulse" r="3.5">
+            <animate attributeName="cx" values="750;450" dur="2.8s" repeatCount="indefinite" begin="1.4s"/>
+            <animate attributeName="cy" values="460;300" dur="2.8s" repeatCount="indefinite" begin="1.4s"/>
+            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="2.8s" repeatCount="indefinite" begin="1.4s"/>
+          </circle>
+
+          <circle class="orc-pulse" r="3.5">
+            <animate attributeName="cx" values="150;450" dur="2.8s" repeatCount="indefinite" begin="2.1s"/>
+            <animate attributeName="cy" values="460;300" dur="2.8s" repeatCount="indefinite" begin="2.1s"/>
+            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="2.8s" repeatCount="indefinite" begin="2.1s"/>
+          </circle>
+
+          <!-- Hub node -->
+          <circle class="orc-hub-node" cx="450" cy="300" r="32"/>
+          <text class="orc-hub-label" x="450" y="300">P</text>
+          <text class="orc-hub-kicker" x="450" y="362">PRIME / HUB</text>
+
+          <!-- Spoke: Claude Code (top-left) -->
+          <g class="orc-spoke-group">
+            <circle class="orc-spoke-node" cx="150" cy="140" r="10"/>
+            <text class="orc-label-num" x="150" y="78" text-anchor="middle">01 / SPOKE</text>
+            <text class="orc-label-name" x="150" y="100" text-anchor="middle">Claude Code</text>
+            <text class="orc-label-role" x="150" y="118" text-anchor="middle">Anthropic native, long context</text>
+          </g>
+
+          <!-- Spoke: OpenCode (top-right) -->
+          <g class="orc-spoke-group">
+            <circle class="orc-spoke-node" cx="750" cy="140" r="10"/>
+            <text class="orc-label-num" x="750" y="78" text-anchor="middle">02 / SPOKE</text>
+            <text class="orc-label-name" x="750" y="100" text-anchor="middle">OpenCode</text>
+            <text class="orc-label-role" x="750" y="118" text-anchor="middle">Model-agnostic, extensible</text>
+          </g>
+
+          <!-- Spoke: Codex (bottom-right) -->
+          <g class="orc-spoke-group">
+            <circle class="orc-spoke-node" cx="750" cy="460" r="10"/>
+            <text class="orc-label-name" x="750" y="490" text-anchor="middle">Codex</text>
+            <text class="orc-label-role" x="750" y="508" text-anchor="middle">OpenAI native, fast cycles</text>
+            <text class="orc-label-num" x="750" y="528" text-anchor="middle">03 / SPOKE</text>
+          </g>
+
+          <!-- Spoke: Pi (bottom-left) -->
+          <g class="orc-spoke-group">
+            <circle class="orc-spoke-node" cx="150" cy="460" r="10"/>
+            <text class="orc-label-name" x="150" y="490" text-anchor="middle">Pi</text>
+            <text class="orc-label-role" x="150" y="508" text-anchor="middle">Lean harness, specialized</text>
+            <text class="orc-label-num" x="150" y="528" text-anchor="middle">04 / SPOKE</text>
+          </g>
+
+        </svg>
       </div>
     </div>
   </section>
